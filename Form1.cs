@@ -93,5 +93,80 @@ namespace CRUD
                 e.Handled = true; // Memproses karakter
             }
         }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            int index;
+            index = e.RowIndex;
+            DataGridViewRow selectedRow = dataGridView1.Rows[index];
+            txtID.Text = selectedRow.Cells[0].Value.ToString();
+            txtNamaDepan.Text = selectedRow.Cells[1].Value.ToString();
+            txtNamaBelakang.Text = selectedRow.Cells[2].Value.ToString();
+            txtNilai.Text = selectedRow.Cells[3].Value.ToString();
+        }
+
+        private void buttonDelete_Click(object sender, EventArgs e)
+        {
+            SqlCommand cmd4 = new SqlCommand("Delete from materiCRUD where noid=@noid", comn);
+            cmd4.Parameters.AddWithValue("noid", txtID.Text);
+            comn.Open();
+            cmd4.ExecuteNonQuery();
+            comn.Close();
+            bind_data();
+        }
+
+        private void btnEdit_Click(object sender, EventArgs e)
+        {
+            SqlCommand cmd3 = new SqlCommand("Update materiCRUD Set namadepan=@namadepan,namabelakang=@namabelakang,lain=@lainnya where noid=@noid", comn);
+
+            cmd3.Parameters.AddWithValue("namadepan", txtNamaDepan.Text);
+            cmd3.Parameters.AddWithValue("namabelakang", txtNamaBelakang.Text);
+            cmd3.Parameters.AddWithValue("lainnya", txtNilai.Text);
+            cmd3.Parameters.AddWithValue("noid", txtID.Text);
+            comn.Open();
+            cmd3.ExecuteNonQuery();
+            comn.Close();
+            bind_data();
+        }
+
+        private void btnPrintPDF_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        private void printDocument1_PrintPage(object sender, System.Drawing.Printing.PrintPageEventArgs e)
+        {
+            Bitmap imagebmp = new Bitmap(dataGridView1.Width, dataGridView1.Height);
+            dataGridView1.DrawToBitmap(imagebmp, new Rectangle(0, 0, imagebmp.Width, imagebmp.Height));
+            e.Graphics.DrawImage(imagebmp, 120, 20);
+        }
+
+        private void textBoxSearch_TextChanged(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void btnSearch_Click(object sender, EventArgs e)
+        {
+            SqlCommand cmd1 = new SqlCommand("Select noid,namadepan As namadepan,namabelakang As namabelakang,lain from materiCRUD where namadepan Like @namadepan+'%'", comn);
+            cmd1.Parameters.AddWithValue("namadepan", textBoxSearch.Text);
+            SqlDataAdapter adapter = new SqlDataAdapter();
+            adapter.SelectCommand = cmd1;
+            DataTable dt = new DataTable();
+            dt.Clear();
+            adapter.Fill(dt);
+            dataGridView1.DataSource = dt;
+            dataGridView1.ColumnHeadersDefaultCellStyle.Font = new Font("Poppins", 11);
+        }
     }
 }
